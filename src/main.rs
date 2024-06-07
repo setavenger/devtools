@@ -37,8 +37,6 @@ enum Commands {
 fn main() {
     let args = Cli::parse();
   
-    println!("Hello, {:?}!", args.command);
-
     match args.command {
         Commands::Convert { data, from, to } => parse_data(data, from, to)
     }
@@ -59,6 +57,12 @@ fn parse_data(input: String, from: StringConversionOptions, to: StringConversion
         StringConversionOptions::Decimal => {
             interim = decimal_str_to_bytes(&input)
         },
+        StringConversionOptions::Binary => {
+            interim = match binary_string_to_bytes(&input) {
+                Ok(data_bytes) => data_bytes,
+                Err(e) => panic!("unable to decode: {:?}", e),
+            }
+        }
         _ => todo!() 
     };
 
@@ -125,3 +129,14 @@ impl fmt::Display for HexSlice<'_> {
         Ok(())
     }
 }
+
+fn binary_string_to_bytes(binary_str: &str) -> Result<Vec<u8>, std::num::ParseIntError> {
+    binary_str.as_bytes()
+        .chunks(8)
+        .map(|chunk| {
+            let bit_str = std::str::from_utf8(chunk).unwrap();
+            u8::from_str_radix(bit_str, 2)
+        })
+        .collect()
+}
+
