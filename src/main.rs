@@ -5,6 +5,7 @@ mod utils;
 use clap::{Parser, Subcommand};
 use reverse::reverse_byte_slice;
 use std::io::{self, BufRead, IsTerminal};
+use utils::util;
 
 #[derive(Debug, Parser)]
 #[command(name = "devtools")]
@@ -53,7 +54,7 @@ fn main() {
         }
         Commands::Reverse { data } => {
             match data {
-                Some(input) => reverse_byte_slice(&input),
+                Some(input) => util::print_hex_slice(reverse_byte_slice(&input)),
                 None => {
                     let stdin = io::stdin();
                     let handle = stdin.lock();
@@ -65,7 +66,7 @@ fn main() {
                         if line.trim().is_empty() {
                             continue; // Skip empty lines
                         }
-                        reverse_byte_slice(&line)
+                        util::print_hex_slice(reverse_byte_slice(&line))
                     }
                 }
             }

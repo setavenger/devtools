@@ -4,7 +4,7 @@ use clap::ValueEnum;
 use hex;
 use num_bigint::{BigInt, Sign};
 
-use crate::utils::util;
+use crate::utils::util::{self, print_hex_slice};
 
 #[derive(ValueEnum, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum StringConversionOptions {
@@ -45,9 +45,7 @@ pub fn parse_data(input: String, from: StringConversionOptions, to: StringConver
         StringConversionOptions::Decimal => {
             println!("{:?}", vec_to_bigint(interim, true))
         }
-        StringConversionOptions::Hex => {
-            println!("{}", util::HexSlice::new(&interim))
-        }
+        StringConversionOptions::Hex => print_hex_slice(util::HexSlice::new(interim)),
         _ => todo!(),
     }
 }
@@ -90,4 +88,17 @@ fn binary_string_to_bytes(binary_str: &str) -> Result<Vec<u8>, std::num::ParseIn
             u8::from_str_radix(bit_str, 2)
         })
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::vec_to_binary_string;
+
+    #[test]
+    fn test_vec_to_binary_string() {
+        let target = "100000000";
+        let input = vec![0x01, 0x00];
+
+        assert_eq!(vec_to_binary_string(input), target, "strings should match")
+    }
 }
