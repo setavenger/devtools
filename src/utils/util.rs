@@ -1,23 +1,34 @@
 use std::fmt;
 
-pub struct HexSlice<'a>(&'a [u8]);
+#[derive(Debug)]
+pub struct HexSlice(Vec<u8>);
 
-impl<'a> HexSlice<'a> {
-    pub fn new<T>(data: &'a T) -> HexSlice<'a>
-    where
-        T: ?Sized + AsRef<[u8]> + 'a,
-    {
-        HexSlice(data.as_ref())
+impl HexSlice {
+    /// Creates a new [`HexSlice`].
+    pub fn new(data: Vec<u8>) -> HexSlice {
+        HexSlice(data)
     }
 }
 
 // You can choose to implement multiple traits, like Lower and UpperHex
-impl fmt::Display for HexSlice<'_> {
+impl fmt::Display for HexSlice {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        for byte in self.0 {
-            // Decide if you want to pad the value or have spaces inbetween, etc.
-            write!(f, "{:02x}", byte)?;
+        for byte in &self.0 {
+            match write!(f, "{:02x}", byte) {
+                Ok(_) => continue,
+                Err(e) => panic!("{}", e),
+            }
         }
         Ok(())
     }
+}
+
+impl PartialEq for HexSlice {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+pub fn print_hex_slice(hex_slice: HexSlice) {
+    println!("{}", hex_slice)
 }
